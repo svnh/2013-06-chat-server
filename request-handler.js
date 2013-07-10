@@ -16,6 +16,7 @@ var parseMsgObj = function (JSONmessage) {
   return result;
 };
 
+var tempX = JSON.stringify({"results":[{"text":" hello","createdAt":"2013-07-09T19:05:28.916Z","updatedAt":"2013-07-09T19:05:28.916Z","objectId":"RhhvKuJMga"},{"text":" Messageadsfdf","createdAt":"2013-07-09T19:04:51.494Z","updatedAt":"2013-07-09T19:04:51.494Z","objectId":"B1UaarZgWa"},{"username":"Chief Keef","text":"Where all the spambot shawties at?","createdAt":"2013-07-09T17:59:07.357Z","updatedAt":"2013-07-09T17:59:07.357Z","objectId":"uS73zEY9wI"},{"username":"Chief Keef","text":"Where all the spambot shawties at?","createdAt":"2013-07-09T17:59:06.280Z","updatedAt":"2013-07-09T17:59:06.280Z"}]});
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -45,7 +46,9 @@ var handleRequest = function(req, res) {
 
     // route requests
     if (req.method === "GET") {
-      handleResponse(200, JSON.stringify(messages), 'JSON');
+      // handleResponse(200, JSON.stringify(messages), 'JSON');
+      handleResponse(200, tempX, 'text');
+
     } else if (req.method === "POST") {
 
       var result = "";
@@ -57,9 +60,12 @@ var handleRequest = function(req, res) {
 
       // we finish receiving data
       req.on("end", function(){
-        messages.push(JSON.parse(result));
-        console.log(messages);
-        handleResponse(201, "message created", 'JSON');
+        messages.push(result);
+        temp = {
+          "result": result
+        };
+        handleResponse(201, "message recieved", 'JSON');
+        // handleResponse(200, JSON.stringify(temp), 'JSON');
       });
     }
   }
