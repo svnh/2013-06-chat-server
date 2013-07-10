@@ -3,6 +3,8 @@
  * basic-server.js.  So you must figure out how to export the function
  * from this file and include it in basic-server.js. Check out the
  * node module documentation at http://nodejs.org/api/modules.html. */
+var url = require('url');
+var messages = []; //todo: handle multiple rooms
 
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
@@ -11,14 +13,39 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
-var handleRequest = function(request, response) {
-  console.log("Serving request type " + request.method + " for url " + request.url);
-  var statusCode = 200;
-  var headers = defaultCorsHeaders;
-  headers['Content-Type'] = "text/plain";
-  response.writeHead(statusCode, headers);
-  response.end("Hello, World!");
-};
+var handleRequest = function(req, res) {
 
+  var handleResponse = function(statusCode, responseBody, type){
+    var headers = defaultCorsHeaders;
+    if (type === 'text'){
+      headers['Content-Type'] = "text/plain";
+    } else if (type === 'JSON') {
+      headers['Content-Type'] = "application/json";
+    }
+    res.writeHead(statusCode, headers);
+    res.end(responseBody);
+  };
+
+  var path = url.parse(req.url).path.split("/");
+  if (path[1] !== 'classes' || path.length !== 3) {
+    handleResponse(404, "not a valid URL", 'text');
+  } else {
+    if (req.method === "GET") {
+      handleResponse(200, JSON.stringify(messages), 'JSON');
+    } else if (req.method === "POST") {
+      var result = ""; //add createdAt
+      req.on("data", function(message) {
+        result += message;
+      });
+      req.on("end", function(){
+        messages.push(JSON.parse(result));
+        handleResponse(201, "message created", 'text');
+      });
+    }
+  }
+
+  // console.log("Serving request type " + req.method + " for url " + req.url);
+  handleResponse(200, "awesome job", 'text');
+};
 
 exports.handleRequest = handleRequest;
