@@ -6,6 +6,16 @@
 var url = require('url');
 var messages = []; //todo: handle multiple rooms
 
+var parseMsgObj = function (JSONmessage) {
+  message = JSON.parse(JSONmessage);
+  var result = {
+    "username": message.username || "anon",
+    "createdAt": new Date(),
+    "text": message.text || undefined
+  };
+  return result;
+};
+
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -27,19 +37,29 @@ var handleRequest = function(req, res) {
   };
 
   var path = url.parse(req.url).path.split("/");
+
+  // verify valid url status
   if (path[1] !== 'classes' || path.length !== 3) {
     handleResponse(404, "not a valid URL", 'text');
   } else {
+
+    // route requests
     if (req.method === "GET") {
       handleResponse(200, JSON.stringify(messages), 'JSON');
     } else if (req.method === "POST") {
-      var result = ""; //add createdAt
+
+      var result = "";
+
+      // we start receiving data
       req.on("data", function(message) {
-        result += message;
+        result += JSON.stringify(parseMsgObj(message));
       });
+
+      // we finish receiving data
       req.on("end", function(){
         messages.push(JSON.parse(result));
-        handleResponse(201, "message created", 'text');
+        console.log(messages);
+        handleResponse(201, "message created", 'JSON');
       });
     }
   }
