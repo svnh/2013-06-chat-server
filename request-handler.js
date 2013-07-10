@@ -46,8 +46,11 @@ var handleRequest = function(req, res) {
 
     // route requests
     if (req.method === "GET") {
-      // handleResponse(200, JSON.stringify(messages), 'JSON');
-      handleResponse(200, tempX, 'text');
+      // console.log(JSON.stringify(messages));
+      // handleResponse(200, JSON.stringify(messages), 'text');
+      var temZ = JSON.stringify({"results": messages });
+      console.log(temZ);
+      handleResponse(200, temZ, 'text');
 
     } else if (req.method === "POST") {
 
@@ -64,7 +67,7 @@ var handleRequest = function(req, res) {
         temp = {
           "result": result
         };
-        handleResponse(201, "message recieved", 'JSON');
+        handleResponse(201, "message recieved", 'text');
         // handleResponse(200, JSON.stringify(temp), 'JSON');
       });
     }
