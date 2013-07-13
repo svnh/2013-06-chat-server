@@ -4,6 +4,9 @@
  * from this file and include it in basic-server.js. Check out the
  * node module documentation at http://nodejs.org/api/modules.html. */
 var url = require('url');
+var fs = require('fs');
+var sql = require("../SQL/persistent_server.js");
+
 var messages = []; //todo: handle multiple rooms
 
 var parseMsgObj = function (message) {
@@ -23,6 +26,7 @@ var defaultCorsHeaders = {
 };
 
 var handleRequest = function(req, res) {
+  console.log('req.url', req.url);
 
   var handleResponse = function(statusCode, responseBody, type){
     var headers = defaultCorsHeaders;
@@ -30,6 +34,8 @@ var handleRequest = function(req, res) {
       headers['Content-Type'] = "text/plain";
     } else if (type === 'JSON') {
       headers['Content-Type'] = "application/json";
+    } else if (type === 'html') {
+      headers['Content-Type'] = "text/html";
     }
     res.writeHead(statusCode, headers);
     res.end(responseBody);
@@ -37,9 +43,23 @@ var handleRequest = function(req, res) {
 
   var path = url.parse(req.url).path.split("/");
 
+  var chatPath = '/Users/savannahkunovsky/2013-06-databases/2013-06-chat-server/2013-06-chat-client';
+
   // verify valid url status
-  if (path[1] !== 'classes' || path.length !== 3) {
-    handleResponse(404, "not a valid URL", 'text');
+   if (path[1] !== 'classes') {
+    var relPath = chatPath + req.url;
+    //using regex is not a good idea, use url.parse search instead
+    //need to match query because usernames are inserted
+    if (req.url.match(/\?/)) {
+      relPath = chatPath + '/index.html';
+    }
+    if( fs.existsSync(relPath) ){
+      //readFileSync returns the contents of the specified file from 'relPath'
+      var filecontent = fs.readFileSync(relPath, 'utf8');
+      handleResponse(200, filecontent, 'html');
+    } else {
+      handleResponse(404, "not a valid URL", 'text');
+    }
   } else {
 
     // route requests
