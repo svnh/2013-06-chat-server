@@ -41,7 +41,7 @@ exports.handleRequest = function(req, res) {
   };
 
   var path = url.parse(req.url).pathname.split('/');
-  var room = path[0] === 'classes' ? path[1] : null;
+  var room = path[1] === 'classes' ? path[2] : null;
 
   if (req.method === 'GET' && url.parse(req.url).pathname === '/' || url.parse(req.url).pathname === '/index.html') {
     //readFileSync returns the contents of the specified file from 'relPath'
