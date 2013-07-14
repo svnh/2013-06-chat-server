@@ -2,7 +2,7 @@ var url = require('url');
 var fs = require('fs');
 var sql = require("../SQL/persistent_server.js");
 
-var messages = []; //todo: handle multiple rooms
+var messages = [];
 
 var parseMsgObj = function (message) {
   var result = {
