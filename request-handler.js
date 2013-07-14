@@ -58,15 +58,19 @@ exports.handleRequest = function(req, res) {
     handleResponse(200, setupJS, 'js');
   } else if (room) {
     if (req.method === 'GET' || req.method === 'OPTIONS') {
-    var roomData = sql.getRoomMessages(room);
-    handleResponse(200, roomData, 'json');
+      sql.getRoomMessages(room, function(roomData){
+        handleResponse(200, JSON.stringify(roomData), 'json');
+      });
     } else if (req.method === 'POST') {
       var data = '';
       req.on('data', function(chunk) {
         data += chunk;
       });
       req.on('end', function(){
-        sql.putDataDB(data, room);
+        data = JSON.parse(data);
+        sql.putDataDB(data, room, function(){
+          console.log('putDataDB worked');
+        });
       });
     }
   } else {
