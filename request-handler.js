@@ -21,7 +21,6 @@ var defaultCorsHeaders = {
 };
 
 exports.handleRequest = function(req, res) {
-  //console.log('req.url', req.url);
 
   var handleResponse = function(statusCode, responseBody, type){
     var headers = defaultCorsHeaders;
@@ -42,7 +41,6 @@ exports.handleRequest = function(req, res) {
 
   var path = url.parse(req.url).pathname.split('/');
   var room = path[1] === 'classes' ? path[2] : null;
-
   if (req.method === 'GET' && url.parse(req.url).pathname === '/' || url.parse(req.url).pathname === '/index.html') {
     //readFileSync returns the contents of the specified file from 'relPath'
     var indexHTML = fs.readFileSync('./2013-06-chat-client/index.html', 'utf8');
@@ -69,7 +67,7 @@ exports.handleRequest = function(req, res) {
       req.on('end', function(){
         data = JSON.parse(data);
         sql.putDataDB(data, room, function(){
-          console.log('putDataDB worked');
+          handleResponse(200, JSON.stringify(data), 'json');
         });
       });
     }
